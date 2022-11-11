@@ -181,7 +181,7 @@ fs.writeFile(ERROR_LOG, '', () => {
 // Note that no checks are done on the validity of inputFile or its data.
 const inputFileText = fs.readFileSync(inputFile, 'utf8').trim();
 const pages = [];
-for (const page of inputFileText.split('\r\n')) {
+for (const page of inputFileText.split('\n')) {
   pages.push({
     page: page,
     url: getUrl(page),
@@ -299,8 +299,12 @@ function addWebVitalsScores(url, results) {
     if (!results.audits[auditID] ||
         // ...or there is an error getting a score.
         results.audits[auditID].scoreDisplayMode === 'error') {
-      displayAndWriteError(`Error getting ${auditID} score for ${url}.`);
-    } else {
+
+        results.audits[auditID] = {};
+        results.audits[auditID].numericValue = "0";
+        displayAndWriteError(`Error getting ${auditID} score for ${url}.`);
+      }
+
       // If this is the first time Web Vitals scores have been added for this page.
       // TODO: not run this for each call to this function.
       if (!outputData[pageIndex].webVitalsScores) {
@@ -317,7 +321,6 @@ function addWebVitalsScores(url, results) {
       // numericValue is a measured value (such as milliseconds for FCP)
       // whereas each category score is an aggregated rating between 0 and 1.
       outputData[pageIndex].webVitalsScores[auditID].push(numericValue);
-    }
   }
 }
 
